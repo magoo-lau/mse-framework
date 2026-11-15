@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>starter-security</artifactId>
+    <name>starter-security</name>
+    <description>安全自动装配件：装配 common-security 的平台端/租户端双 StpLogic、SaInterceptor 与 token-租户上下文同步；工具与能力本体在 common-security</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-security</artifactId>
+        </dependency>
+    </dependencies>
+</project>

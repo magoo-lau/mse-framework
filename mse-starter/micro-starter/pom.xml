@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>micro-starter</artifactId>
+    <name>micro-starter</name>
+    <description>【使用方入口】微服务形态启动器：Nacos 配置中心/服务注册（网关 lb:// 路由）+ Dubbo RPC（内置
+        mse.rpc.mode=dubbo 默认值，显式配置可覆盖）+ 基座契约消费桥接（starter-bridge，基座本地实现在 classpath 时自动让位）
+        + Seata 内置（starter-seata，微服务基础能力；未用全局事务经 Nacos seata.enabled=false 关停，无需改 pom）
+        + actuator + MySQL/达梦/人大金仓驱动。业务微服务 = 本模块 + xxx-service（+ 按需 mq-starter）</description>
+
+    <dependencies>
+        <!-- RPC 装配与模式引擎：本模块的 EnvironmentPostProcessor 提供 dubbo 默认值 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-rpc</artifactId>
+        </dependency>
+        <!-- 基座契约消费端桥接：鉴权数据源（@SaCheckPermission）/独立库租户路由/操作日志的 RPC 回退实现，
+             经契约消费 mse-system / mse-tenant——业务服务不打包基座 HTTP 接口 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-bridge</artifactId>
+        </dependency>
+        <!-- Seata AT 分布式事务：微服务形态基础能力，默认经共享配置 seata.enabled=false 关停、按需开启 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-seata</artifactId>
+        </dependency>
+        <!-- 微服务基线：Nacos 配置中心（spring.config.import 拉取共享/专属配置）+ 服务注册 + 负载均衡 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+        <!-- Dubbo RPC 运行时（starter-rpc 引擎在 mse.rpc.mode=dubbo 时启用导出/引用） -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- 三方言驱动一并打入：切换数据库只改配置（spring.profiles.active=dm/kingbase），免重新打包 -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver18</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>cn.com.kingbase</groupId>
+            <artifactId>kingbase8</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,23 @@
+# ==================== mse-platform 专属配置 ====================
+# Data ID: mse-platform.yaml    Group: DEFAULT_GROUP
+server:
+  port: 48082
+
+spring:
+  servlet:
+    multipart:
+      # 品牌素材 Logo 2MB / 背景图 8MB 上限由 DomainAssetStorage 把守（servlet 层只是粗上限）；
+      # 大上限供「离线交付 → 运行时套件」上传 GB 级套件包 zip（对齐租户侧数据载荷包口径）
+      max-file-size: 20GB
+      max-request-size: 20GB
+
+# 授权签发私钥：平台签发租户 license、签名离线交付包共用（RS256）。出厂不带默认密钥，
+# 部署方自行生成一次并长期保管（换钥即作废全部已签发凭证/部署包）：
+#   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out license.pem
+#   openssl pkcs8 -topk8 -nocrypt -in license.pem -outform DER | base64 -w 0   # 私钥 Base64 单行填入下方
+#   openssl pkey -in license.pem -pubout -outform DER | base64 -w 0            # 公钥交付租户配 mse.license.public-key
+# 私钥提取勿用 pkey -outform DER：OpenSSL 3 对 RSA 私钥 DER 透传 PKCS#1，签发报 algid parse error
+# 详见 docs/tech/standalone.md 第三节。
+# mse:
+#   license:
+#     private-key: <PKCS#8 RSA 私钥 Base64 单行>

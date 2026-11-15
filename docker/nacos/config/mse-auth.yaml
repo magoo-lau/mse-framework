@@ -1,0 +1,14 @@
+# ==================== mse-auth 专属配置（纯 Dubbo 消费端，不连数据库） ====================
+# Data ID: mse-auth.yaml    Group: DEFAULT_GROUP
+server:
+  port: 48083
+
+spring:
+  autoconfigure:
+    # 排除数据源自动装配（service-auth 传递依赖 dynamic-datasource 但不使用）
+    # 注意：Boot 4 起自动配置类移包（org.springframework.boot.jdbc.autoconfigure），旧类名会静默失效
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+  datasource:
+    dynamic:
+      enabled: false

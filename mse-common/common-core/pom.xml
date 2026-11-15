@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-common</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>common-core</artifactId>
+    <name>common-core</name>
+    <description>基础内核：租户/用户上下文、统一返回、异常、常量、通用注解</description>
+
+    <dependencies>
+        <!-- 跨线程池/异步场景的上下文透传（虚拟线程场景见 TenantContext 注释） -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
+        </dependency>
+        <!-- 租户上下文跨线程自动传播适配（ThreadLocalAccessor 注册；Reactor 自动传播/线程池装饰消费），版本由基座 BOM 经 micrometer-bom 仲裁 -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>context-propagation</artifactId>
+        </dependency>
+        <!-- LogContext 日志上下文镜像（slf4j MDC），版本由基座 BOM 仲裁 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Dubbo 原生 @Method/@Argument 注解：RpcService/RpcReference 的 Dubbo 嵌套注解 methods() 属性类型
+             声明用。必须编译期传递（非 optional）：javac 完成注解符号时解析全部属性签名，所有使用
+             @RpcService/@RpcReference 的下游模块编译类路径都要求 dubbo 类（Spring 运行期反射完成属性
+             签名同理）；dubbo 模式运行件（netty-all/javassist 等）随之传递，版本由基座 BOM/Spring Boot
+             netty 管理对齐。单体运行期经 mse.rpc.mode 门控零触达（local 分支短路、核心 jar 无 Spring
+             自动装配注册），微服务由 dubbo-spring-boot-starter 提供完整运行时 -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+        <!-- 单测（LicenseCodec/DeliverCodec 签名往返） -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

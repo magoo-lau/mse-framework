@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>mono-starter</artifactId>
+    <name>mono-starter</name>
+    <description>【使用方入口】单体形态启动器：聚合基座三积木 service-system/tenant/auth（传递带入 starter-web/mybatis/redis/security/rpc
+        全部装配件）+ starter-bridge（基座契约桥接，单体下全部让位本地实现；含 db/base 基座库脚本推送）+ actuator
+        + MySQL/达梦/人大金仓驱动。mse.rpc.mode 默认 local，默认仅需 MySQL + Redis，无 Nacos/Dubbo/Seata；
+        MQ 与形态无关——需要 RocketMQ 由使用方按需加 mq-starter + rocketmq 配置（不配则事件降级 noop）；
+        单体聚合 = 本模块 + 各业务 xxx-service jar。基座 HTTP 接口（登录/系统管理/租户管理）随三积木在本进程内提供</description>
+
+    <dependencies>
+        <!-- 基座三积木：starter-web/mybatis/redis/security/rpc 由其父 pom 统一依赖、传递带入 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>service-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>service-platform</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>service-auth</artifactId>
+        </dependency>
+        <!-- 基座契约桥接（单体下各 RPC 回退 Bean 让位基座本地实现）+ db/base 基座库脚本推送 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-bridge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- 三方言驱动一并打入：切换数据库只改配置（spring.profiles.active=dm/kingbase），免重新打包 -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver18</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>cn.com.kingbase</groupId>
+            <artifactId>kingbase8</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>

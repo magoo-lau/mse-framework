@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-common</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>common-security</artifactId>
+    <name>common-security</name>
+    <description>安全基础设施：Sa-Token 平台端/租户端双账号体系、token-租户上下文同步、BCrypt</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-web</artifactId>
+        </dependency>
+        <!-- Sa-Token 会话存储复用业务 Redis（微服务模式下网关/各服务共享会话） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot4-starter</artifactId>
+        </dependency>
+        <!-- sa-token 会话的 Redis 序列化：本体基于 Jackson 2（1.46.0 无官方 Jackson3 变体）——
+             与全站 Jackson 3 基线并存的已知双轨项，仅序列化 sa-token 自身会话结构，不与业务 RedisTemplate 交互；
+             升级 sa-token 时关注官方 Jackson 3 支持进展 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-jackson</artifactId>
+        </dependency>
+        <!-- 仅用 BCrypt 做口令散列，不引入完整 Spring Security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+    </dependencies>
+</project>

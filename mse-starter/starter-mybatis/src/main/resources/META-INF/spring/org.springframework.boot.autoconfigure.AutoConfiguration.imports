@@ -1,0 +1,5 @@
+vip.mseapp.mybatis.config.MseMybatisAutoConfiguration
+vip.mseapp.mybatis.config.SlowSqlEndpointAutoConfiguration
+vip.mseapp.mybatis.config.TenantDsAutoConfiguration
+vip.mseapp.mybatis.config.TenantRouteTransactionAutoConfiguration
+vip.mseapp.mybatis.config.TenantSchemaAutoConfiguration

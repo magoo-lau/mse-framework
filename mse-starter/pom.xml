@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-framework</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>mse-starter</artifactId>
+    <packaging>pom</packaging>
+    <name>mse-starter</name>
+    <description>启动器区：自动装配与形态启动器。命名规则——starter-* 前缀为框架内部装配件（工具本体在 mse-common），
+        xxx-starter 后缀为使用方直接引用的入口启动器（mono-starter / micro-starter / mq-starter，对照 boot-* 框架启动器与 *-boot 业务启动器）</description>
+
+    <modules>
+        <!-- 内部装配件：仅含 AutoConfiguration（FQCN 与拆分前一致），工具类留在 mse-common -->
+        <module>starter-web</module>
+        <module>starter-mybatis</module>
+        <module>starter-redis</module>
+        <module>starter-security</module>
+        <module>starter-rpc</module>
+        <module>starter-ai</module>
+        <module>starter-bridge</module>
+        <module>starter-seata</module>
+        <!-- 使用方入口启动器：形态二选一 + 按需选装 -->
+        <module>mono-starter</module>
+        <module>micro-starter</module>
+        <module>tenant-starter</module>
+        <module>mq-starter</module>
+        <module>mail-starter</module>
+        <!-- 业务工程统一父 pom（独立 pom，不参与 parent 链） -->
+        <module>mse-starter-parent</module>
+    </modules>
+</project>

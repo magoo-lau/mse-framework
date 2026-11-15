@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>starter-seata</artifactId>
+    <name>starter-seata</name>
+    <description>Seata AT 分布式事务装配件（内部部件，随 micro-starter 内置为微服务基础能力；单体不带，
+        @GlobalTransactional 在无 Seata classpath 时被忽略）：数据源代理（叠加 dynamic-datasource）、undo_log 治理。
+        业务 service 模块仅在直接使用 @GlobalTransactional 注解时引用本模块（编译期），运行期由 micro-starter 提供</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seata</groupId>
+            <artifactId>seata-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.seata</groupId>
+            <artifactId>seata-sqlparser-druid</artifactId>
+        </dependency>
+        <!-- Seata 官方 Dubbo XID 传播（TransactionPropagationFilter，Dubbo SPI 自动激活）。
+             无 Dubbo classpath 时（单体形态）该 filter 不存在，零影响。
+             依赖的 seata-core/dubbo 均为 optional，版本由 mse-dependencies 仲裁 -->
+        <dependency>
+            <groupId>org.apache.dubbo.extensions</groupId>
+            <artifactId>dubbo-filter-seata</artifactId>
+        </dependency>
+    </dependencies>
+</project>

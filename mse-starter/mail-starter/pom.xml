@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>mail-starter</artifactId>
+    <name>mail-starter</name>
+    <description>【使用方入口】邮件启动器：引入即按开关装配 MseMailSender（工具本体在 common-mail）；
+        单体/微服务均可选装，mse.mail.enabled=false（默认）时 Bean 不注册，使用方经 ObjectProvider 判空感知不可用；
+        不需要邮件能力的服务不引入即天然裁剪</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-mail</artifactId>
+        </dependency>
+    </dependencies>
+</project>

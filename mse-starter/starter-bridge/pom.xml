@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>starter-bridge</artifactId>
+    <name>starter-bridge</name>
+    <description>基座契约消费端桥接（内部装配件，随 micro-starter 提供）：未装配基座 service-* 的微服务经本模块获得鉴权数据源（StpInterface）、
+        租户路由解析（RpcTenantRouteResolver）/租户数据源元数据（RpcTenantDsMetadataProvider）与操作日志落库（OperLogRecorder）的 RPC 回退实现；
+        classpath 出现基座本地实现时自动让位（单体聚合不受影响）</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-redis</artifactId>
+        </dependency>
+        <!-- 租户数据源元数据 RPC 通道（TenantDsMetadataProvider/Definition，动态租户数据源） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-security</artifactId>
+        </dependency>
+        <!-- 基座契约：权限码/组织/用户（api-system）与租户（api-tenant），实现方为 mse-system/mse-tenant -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-tenant</artifactId>
+        </dependency>
+        <!-- dubbo 模式脚本推送：编程式 ReferenceConfig（运行期微服务宿主经 micro-starter 提供）；
+             common-rpc 提供 DubboRuntimeConfigs（宿主经 starter-rpc 传递） -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-rpc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-mq</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 租户事件 MQ 消费端（TenantEventMqListener，微服务形态即时通道）：宿主按需引入
+             mq-starter 时才在 classpath（provided 不传递；装配经 @ConditionalOnClass 条件隔离） -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Jackson 2：TenantSnapshotStore 快照载荷写读同 mapper（双轨知悉项，版本由 Boot 4 的 jackson-2-bom 托管）；
+             显式声明避免依赖 redisson 等上游传递，上游变化不连锁断编译 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
+</project>

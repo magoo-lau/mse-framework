@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-service</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>service-job</artifactId>
+    <name>service-job</name>
+    <description>薄调度中心：mse-job 的到期计算与派发（置 trigger_pending + 踢键，复用既有触发链路）</description>
+
+    <dependencies>
+        <!-- 触发踢键（StringRedisTemplate）：编译期可见，运行期由 mono/micro-starter 传递装配 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-redis</artifactId>
+        </dependency>
+        <!-- 单测（到期判定/表达式解析） -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

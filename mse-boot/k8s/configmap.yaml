@@ -1,0 +1,33 @@
+# 共享环境配置：所有 boot 模块通过 envFrom 注入
+# 地址默认指向「集群内同名中间件 Service」，按实际环境修改
+# 生产环境：MSE_MYSQL_PASSWORD 等敏感项改用 Secret 注入
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mse-config
+  labels:
+    app.kubernetes.io/part-of: ai-mse
+data:
+  MSE_MYSQL_HOST: "mse-mysql"       # 集群外数据库则填可达地址
+  MSE_MYSQL_PORT: "3306"
+  MSE_MYSQL_DB: "mse"
+  MSE_MYSQL_USER: "root"
+  MSE_MYSQL_PASSWORD: "123456"
+  # ===== 信创数据库（可选，默认 MySQL）=====
+  # 切达梦/金仓：取消下方对应注释（并把上面 MSE_MYSQL_* 四项删除或留空），
+  # SPRING_PROFILES_ACTIVE 对全部经 envFrom 注入的启动器生效
+  # SPRING_PROFILES_ACTIVE: "dm"     # dm=达梦 DM8，kingbase=人大金仓
+  # MSE_DM_HOST: "mse-dameng"
+  # MSE_DM_PORT: "5236"
+  # MSE_DM_USER: "SYSDBA"
+  # MSE_DM_PASSWORD: "SYSDBA001"
+  # MSE_KB_HOST: "mse-kingbase"
+  # MSE_KB_PORT: "54321"
+  # MSE_KB_USER: "system"
+  # MSE_KB_PASSWORD: "123456"
+  MSE_REDIS_HOST: "mse-redis"
+  MSE_REDIS_PORT: "6379"
+  MSE_NACOS_ADDR: "mse-nacos:8848"  # 微服务模式必填，单体模式不使用
+  MSE_ROCKETMQ_ADDR: "mse-rocketmq:9876"
+  MSE_SEATA_ENABLED: "false"
+  MSE_SEATA_ADDR: "mse-seata:8091"

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-service</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>service-platform</artifactId>
+    <name>service-platform</name>
+    <description>租户管理：租户/套餐 CRUD、租户开通、登录校验</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-tenant</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-system</artifactId>
+        </dependency>
+        <!-- 品牌素材公开素材通道契约（FsAvailableCondition 检测 classpath 决定是否走 mse-fs，未引入时降级本地） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-fs</artifactId>
+        </dependency>
+        <!-- 租户事件（控制面 → 数据面编排：开通/冻结/套餐变更等经 TenantEvent 下发） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-mq</artifactId>
+        </dependency>
+        <!-- 品牌域名 Redis 缓存（DomainBrandingCache/LockOps）：编译期可见，运行期由 mono/micro-starter 传递装配 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-redis</artifactId>
+        </dependency>
+        <!-- Jackson 2：离线交付导出链（DeliverPackageService manifest 规范化签名 / TenantDataExporter JSONL 行，
+             双轨知悉项，版本由 Boot 4 的 jackson-2-bom 托管）——与 tenant-starter 导入端同轨，切换需两端成对；
+             显式声明避免依赖上游传递，上游变化不连锁断编译 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
+</project>

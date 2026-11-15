@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-framework</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>mse-api</artifactId>
+    <packaging>pom</packaging>
+    <name>mse-api</name>
+    <description>跨模块服务契约：Dubbo 接口 + DTO（service 模块之间唯一合法依赖）</description>
+
+    <modules>
+        <module>api-system</module>
+        <module>api-tenant</module>
+        <module>api-fs</module>
+        <module>api-notify</module>
+    </modules>
+</project>

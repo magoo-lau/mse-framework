@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-service</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>service-system</artifactId>
+    <name>service-system</name>
+    <description>系统管理：用户/角色/菜单 + Sa-Token 权限数据源</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-tenant</artifactId>
+        </dependency>
+        <!-- 用户头像公开素材通道契约（AvatarAvailableCondition 检测 classpath 决定是否走 mse-fs，未引入时降级本地） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-fs</artifactId>
+        </dependency>
+        <!-- 框架通知中枢契约（消息中心多渠道化：发送/渠道自注册/登记接收） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>api-notify</artifactId>
+        </dependency>
+        <!-- 微服务形态渠道路由：编程式 ReferenceConfig 按提供组定向（运行期宿主经 micro-starter 提供） -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- 用户导入/导出（Excel） -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+        </dependency>
+        <!-- 双因子认证：TOTP 绑定二维码渲染（OTP 算法本体在 common-security TotpUtils，纯 JDK 实现） -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+        </dependency>
+        <!-- 品牌域名 Redis 缓存（DomainBrandingCache/LockOps）：编译期可见，运行期由 mono/micro-starter 传递装配 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-redis</artifactId>
+        </dependency>
+        <!-- 邮箱动态码降级通道：mail-starter 按开关装配 MseMailSender，未启用时 Bean 缺席=通道不可用 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>mail-starter</artifactId>
+        </dependency>
+        <!-- 目录变更批次渲染器单测 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

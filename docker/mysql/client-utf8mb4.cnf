@@ -1,0 +1,11 @@
+# 容器内 mysql 客户端默认字符集。
+# 背景：mysql:8.4 镜像客户端默认 latin1（服务端已是 utf8mb4），`docker exec -i ... mysql < xx.sql`
+# 管道导入 UTF-8 脚本时中文按 latin1 双重编码入库，页面读出乱码。此文件把客户端默认统一为 utf8mb4。
+# 挂载到 /etc/mysql/conf.d/（/etc/my.cnf 的 !includedir 对客户端同样生效；mysqld 忽略
+# [client]/[mysql] 组，服务端行为不受影响）。docker-entrypoint-initdb.d 的 init 脚本自带
+# SET NAMES utf8mb4，不依赖本文件。
+[client]
+default-character-set = utf8mb4
+
+[mysql]
+default-character-set = utf8mb4

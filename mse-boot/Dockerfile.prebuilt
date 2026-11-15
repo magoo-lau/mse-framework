@@ -1,0 +1,38 @@
+# =============================================================================
+# 预构建模式（所有启动器通用）：宿主机先 mvn package，再把现成 jar 打成镜像（本地迭代最快）
+# 注意：勿加 `# syntax=docker/dockerfile:1` —— 本文件只用内置前端支持的特性，
+# 该指令会让 BuildKit 构建前先去 Docker Hub 拉取前端镜像，离线/受限网络下直接构建失败
+#
+# 用法（context = 模块目录，注意最后的 `.` 换成对应模块路径）：
+#   mvn -B -DskipTests package -pl mse-framework/mse-boot/boot-system -am
+#   docker build -f mse-framework/mse-boot/Dockerfile.prebuilt --build-arg PORT=48081 \
+#                -t mse/boot-system:dev mse-framework/mse-boot/boot-system
+# =============================================================================
+
+ARG RUNTIME_IMAGE=eclipse-temurin:21-jre-jammy
+
+# ---- 阶段 1：fat jar 分层解包（依赖层与应用层分离，利于镜像层缓存）----
+# 解包产物：app.jar（瘦启动器）+ lib/（依赖），运行时用 java -jar app.jar 启动
+FROM ${RUNTIME_IMAGE} AS extract
+WORKDIR /build
+COPY target/*.jar app.jar
+RUN java -Djarmode=tools -jar app.jar extract --layers --destination /extracted
+
+# ---- 阶段 2：运行时（与各启动器目录的 Dockerfile 保持一致）----
+FROM ${RUNTIME_IMAGE}
+ARG PORT=8080
+
+ENV TZ=Asia/Shanghai \
+    JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
+
+RUN groupadd -r -g 1001 app && useradd -r -u 1001 -g app -s /usr/sbin/nologin app
+
+WORKDIR /app
+COPY --from=extract --chown=app:app /extracted/dependencies/ ./
+COPY --from=extract --chown=app:app /extracted/spring-boot-loader/ ./
+COPY --from=extract --chown=app:app /extracted/snapshot-dependencies/ ./
+COPY --from=extract --chown=app:app /extracted/application/ ./
+USER app
+EXPOSE ${PORT}
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

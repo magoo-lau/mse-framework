@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/POM-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tenant-starter</artifactId>
+    <name>tenant-starter</name>
+    <description>【使用方入口】租户私有部署形态启动器（standalone）：聚合 service-system + service-auth
+        （本地登录/鉴权/系统管理）+ starter-bridge（db/base 基座数据推送通道，standalone 下
+        RPC 消费端由本模块本地桩承接）+ actuator + 三方言驱动；不含 service-platform（无平台侧）。
+        配 mse.standalone.enabled=true 启用：①固定租户上下文；②基座数据自足（启动对租户库直建
+        base 通道菜单/权限点/子应用注册 + sys_tenant 自身行 + sys_config 参数副本）；
+        ③授权凭证（license）驱动权限域——菜单/权限/角色授权 ∩ 平台签发凭证 menuIds，防伪造越权；
+        到期→宽限→锁定的状态机见 service-system LicenseHolder。
+        租户单体聚合 = 本模块 + 各业务 xxx-service jar（master 数据源指向租户库）</description>
+
+    <dependencies>
+        <!-- 基座积木：登录/鉴权/系统管理本地运行；starter-web/mybatis/redis/security/rpc 经父 pom 传递带入 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>service-system</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>service-auth</artifactId>
+        </dependency>
+        <!-- 基座契约桥接：db/base 基座数据推送通道；RPC 消费端由本模块 Standalone 桩承接（本地桩
+             经 @ConditionalOnMissingBean 优先注册，bridge 的 RPC 版实现自动让位） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>starter-bridge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- 三方言驱动一并打入：切换数据库只改配置（spring.profiles.active=dm/kingbase），免重新打包 -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver18</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>cn.com.kingbase</groupId>
+            <artifactId>kingbase8</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Jackson 2：离线交付导入端 manifest 回读（双轨知悉项，版本由 Boot 4 的 jackson-2-bom 托管）——
+             与 service-platform 导出端同轨（签名按字节验证），切换需两端成对；
+             显式声明避免依赖上游传递，上游变化不连锁断编译 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
+</project>

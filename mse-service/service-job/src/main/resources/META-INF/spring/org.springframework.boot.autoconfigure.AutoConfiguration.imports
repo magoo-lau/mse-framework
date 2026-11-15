@@ -1,0 +1,2 @@
+vip.mseapp.job.autoconfigure.JobServiceAutoConfiguration
+vip.mseapp.job.autoconfigure.JobControllerAutoConfiguration

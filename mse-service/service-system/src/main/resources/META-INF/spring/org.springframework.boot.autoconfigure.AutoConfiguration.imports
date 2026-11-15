@@ -1,0 +1,3 @@
+vip.mseapp.service.system.config.SystemServiceAutoConfiguration
+vip.mseapp.service.system.config.SystemControllerAutoConfiguration
+vip.mseapp.service.system.config.SystemNotifyAutoConfiguration

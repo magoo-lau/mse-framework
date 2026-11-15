@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-framework</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>mse-boot</artifactId>
+    <packaging>pom</packaging>
+    <name>mse-boot</name>
+    <description>微服务启动器：boot-xxx 独立进程（mse.rpc.mode=dubbo + Nacos）；单体示例见 mse-sample/mse-monolith</description>
+
+    <modules>
+        <module>boot-gateway</module>
+        <module>boot-system</module>
+        <module>boot-platform</module>
+        <module>boot-auth</module>
+        <module>boot-job</module>
+    </modules>
+</project>

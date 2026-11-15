@@ -1,0 +1,27 @@
+# ==================== 微服务共享配置（Dubbo RPC / 租户） ====================
+# Data ID: mse-micro-dubbo.yaml    Group: DEFAULT_GROUP
+# Dubbo 提供者/消费者微服务（mse-system / mse-platform / mse-auth）引入；
+# 网关是纯 HTTP（WebFlux）入口，不引入本配置。
+spring:
+  application:
+    service-discovery:
+      migration: FORCE_INTERFACE
+
+dubbo:
+  application:
+    name: ${spring.application.name}
+    qos-enable: false
+  registry:
+    address: nacos://${MSE_NACOS_ADDR:localhost:8848}
+    register-mode: interface
+  protocol:
+    name: tri
+    port: -1
+    # 默认 8MB 不够文件 RPC（mse-fs 契约 base64 传输：20MB 附件约 26.7MB、8MB 品牌素材约 10.7MB）
+    payload: 33554432
+
+mse:
+  rpc:
+    mode: dubbo
+  tenant:
+    enabled: true

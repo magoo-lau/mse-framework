@@ -1,0 +1,12 @@
+# ==================== mse-job 专属配置 ====================
+# Data ID: mse-job.yaml    Group: DEFAULT_GROUP
+server:
+  port: 48084
+
+# 薄调度中心：到期扫描节拍（到期到执行另有踢键→实例 sync 抢占约 5s 级中转）
+mse:
+  job:
+    dispatch-interval: 5s
+    dispatch-initial-delay: 45s
+    # 同任务两次派发最小间隔下限（执行/上报延迟内防重复置 pending）
+    min-redispatch-gap: 30s

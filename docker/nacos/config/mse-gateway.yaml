@@ -1,0 +1,127 @@
+# ==================== mse-gateway 专属配置 ====================
+# Data ID: mse-gateway.yaml    Group: DEFAULT_GROUP
+server:
+  port: 48080
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: mse-job
+              uri: lb://mse-job
+              predicates:
+                - Path=/job/**
+            - id: mse-auth
+              uri: lb://mse-auth
+              predicates:
+                - Path=/auth/**
+            - id: mse-system
+              uri: lb://mse-system
+              predicates:
+                - Path=/system/**
+            - id: mse-platform
+              uri: lb://mse-platform
+              predicates:
+                - Path=/tenant/**,/tenant-package/**
+            # 业务工程与示例（xxx-boot：application.yaml 经 spring.config.import 直连 Nacos，启动即注册）
+            - id: mse-demo
+              uri: lb://mse-demo
+              predicates:
+                - Path=/demo/**
+            - id: mse-open
+              uri: lb://mse-open
+              predicates:
+                - Path=/open/**,/openapp/**
+            - id: mse-oa
+              uri: lb://mse-oa
+              predicates:
+                - Path=/oa/**
+            - id: mse-mp
+              uri: lb://mse-mp
+              predicates:
+                - Path=/mp/**
+            - id: mse-data
+              uri: lb://mse-data
+              predicates:
+                - Path=/data/**,/openapi/data/**
+            - id: mse-ai
+              uri: lb://mse-ai
+              predicates:
+                - Path=/ai/**,/openapi/ai/**
+            - id: mse-fs
+              uri: lb://mse-fs
+              predicates:
+                - Path=/fs/**
+            - id: mse-search
+              uri: lb://mse-search
+              predicates:
+                - Path=/search/**
+            - id: mse-monitor
+              uri: lb://mse-monitor
+              predicates:
+                - Path=/monitor/**
+            - id: mse-mes
+              uri: lb://mse-mes
+              predicates:
+                - Path=/mes/**
+            - id: mse-im
+              uri: lb://mse-im
+              predicates:
+                - Path=/im/**
+
+# 网关免会话校验白名单（Ant 风格，运行期生效无需重启）。
+# ⚠️ Spring 对 list 属性是整体替换：覆盖本项时必须全量列出（含下方默认项）。
+# 放行原则：路径自带等价或更强的鉴权——登录端点本就公开；/open/api/** 由 open-service
+# 应用凭证链路校验；/mp/callback/** 为微信回调由下游验签。细粒度权限仍由下游 @SaCheckPermission 把守。
+mse:
+  gateway:
+    ignore-urls:
+      - /auth/login
+      - /auth/platform/login
+      - /auth/tenant/resolve
+      - /auth/domain/config
+      # 登录图形验证码预检 + 双因子阶段（验证码图/挑战/邮箱码/换正式 token 均凭一次性凭证或风控判定，
+      # 正式 token 仅在 /auth/login/2fa 校验通过后签发）
+      - /auth/captcha/**
+      - /auth/2fa/**
+      - /auth/login/2fa
+      # 域名个性化品牌素材（平台自有登录页，登录页未登录加载 Logo/背景图；文件名白名单定型，公开无敏感数据）
+      - /tenant/domain-config/asset/**
+      # 租户品牌个性化素材（租户自助登录页品牌，同上免登录口径；mse-fs 模式走 /fs/asset/**）
+      - /system/tenant-branding/asset/**
+      # 用户头像本地兜底素材（img 标签不携带 token；文件名白名单定型，公开无敏感数据；mse-fs 模式走 /fs/asset/**）
+      - /system/profile/asset/**
+      # AI 智能体头像本地兜底素材（img 标签不携带 token；文件名白名单定型，公开无敏感数据；mse-fs 模式走 /fs/asset/**）
+      - /ai/agent/asset/*
+      # mse-fs 公开素材通道（仅放行 access_level=public 的文件，登录页素材等；服务端按行校验，非公开 404）
+      - /fs/asset/**
+      # 离线交付大文件签名下载（浏览器原生下载带不了 Authorization 头；token 内嵌 HMAC 签名+有效期，
+      # 下载权限已在 download-url 签发端点校验，服务端验签放行，支持 Range 断点续传）
+      - /tenant/deliver/download/**
+      - /actuator/**
+      - /error
+      - /open/oauth/token
+      - /open/api/**
+      - /mp/callback/**
+      - /openapi/data/**
+      - /openapi/ai/**
+      # IM 工作台一次性 code 兑换标准租户会话（code 本身即短时一次性凭证，
+      # 由 mse-im 校验 GETDEL + 绑定 Origin 站点比对，浏览器必带 Origin）
+      - /im/sso/exchange
+      # 工作台外部应用免登授权（OAuth2 授权码换 token）：对方服务端凭 app_key/app_secret
+      # 调 token 兑换（code 一次性 GETDEL + 常量时间比对密钥），后续凭 Bearer 调 userinfo 识别用户
+      - /im/oauth/token
+      - /im/oauth/userinfo
+      # 工作台入口图标本地兜底素材（img 标签不携带 token；文件名白名单定型，公开无敏感数据；mse-fs 模式走 /fs/asset/**）
+      - /im/workbench/asset/*
+      # 聊天客户端用户自设头像本地兜底素材（img 标签不携带 token；文件名白名单定型，公开无敏感数据；mse-fs 模式走 /fs/asset/**）
+      - /im/client/asset/*
+      # OpenIM webhook 回调（token 即路由凭证：/im/callback/{token}/{command}，
+      # 由 mse-im 按 token 定位租户实例校验，未注册 token 一律 404）
+      - /im/callback/**
+
+logging:
+  level:
+    vip.mseapp: info

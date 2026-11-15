@@ -1,0 +1,53 @@
+# ==================== 微服务共享配置（Redis / Sa-Token / JVM / 日志） ====================
+# Data ID: mse-micro-common.yaml    Group: DEFAULT_GROUP
+# 所有微服务启动器（gateway/system/platform/auth）经 spring.config.import 引入。
+# 基线文件由 compose 的 nacos-config-init 导入 Nacos（已存在的 Data ID 不覆盖），
+# 运行期修改请在 Nacos 控制台操作：http://localhost:18080
+spring:
+  threads:
+    virtual:
+      # JDK 21 虚拟线程默认关闭：MySQL Connector/J 的 synchronized 在 JDK21 会 pin 载体线程，
+      # 待升级 JDK24+/更换驱动后再默认开启
+      enabled: false
+  data:
+    redis:
+      host: ${MSE_REDIS_HOST:localhost}
+      port: ${MSE_REDIS_PORT:6379}
+      database: ${MSE_REDIS_DB:0}
+
+sa-token:
+  token-name: ${MSE_TOKEN_NAME:Authorization}
+  timeout: 2592000          # token 有效期（秒）：30 天
+  active-timeout: -1        # 不做活跃检查
+  is-concurrent: true
+  is-share: false           # 每次登录独立 token 会话：多端/同端多次登录各成一条会话，可单条查看与下线（登录设备管理依赖）
+  token-style: uuid
+  is-log: false
+  is-read-cookie: false
+  is-read-header: true
+
+# 租户数据源连接密码的 AES 加密密钥：每个微服务 JVM 内独立解密注册，所有服务必须一致；
+# 不配时代码默认 mse-ds-dev-key-2026（仅供本地开发）。生产必须经环境变量更换，
+# 且更换后需在「租户数据源」界面重新保存各数据源密码——旧密文无法用新密钥解开
+#
+# Actuator 端点鉴权共享令牌（starter-web 过滤器 + 网关 WebFilter 同读此键）：
+# 空（默认）= 关闭，/actuator/** 保持匿名（本地开发零改动）；非空后各服务与网关的
+# /actuator/**（health/info/metrics/slowsql）均要求请求头 X-Actuator-Token（mse-monitor
+# 探针经同一环境变量自动对齐）。生产必须注入强随机值（openssl rand -hex 32）；
+# K8s 探针见各 boot 模块 k8s/*.yaml（exec + curl 带头）；放行个别路径配
+# mse.actuator.auth.permit-ant-patterns（如 [/actuator/health*] 匿名放健康检查）
+mse:
+  tenant:
+    dynamic-ds:
+      encrypt-key: ${MSE_TENANT_DS_ENCRYPT_KEY:mse-ds-dev-key-2026}
+  actuator:
+    auth:
+      token: ${MSE_ACTUATOR_TOKEN:}
+
+logging:
+  level:
+    vip.mseapp: debug       # 网关在 mse-gateway.yaml 覆盖为 info
+  pattern:
+    # 日志上下文注入 Boot 默认格式（保留颜色/PID/线程名等）：traceId 全链路串联（网关生成/透传、
+    # Dubbo attachment 续传），tenant/user 认证后镜像进 MDC，ds 为语句级数据源路由标注（落主库时显示 -）
+    correlation: "[trace:%X{traceId:-} tenant:%X{tenantId:-} user:%X{userId:-} ds:%X{ds:-}] "

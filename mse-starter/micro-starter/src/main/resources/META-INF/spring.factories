@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  vip.mseapp.starter.micro.config.MicroRpcModeEnvironmentPostProcessor

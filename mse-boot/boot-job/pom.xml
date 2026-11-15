@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-boot</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>boot-job</artifactId>
+    <name>boot-job</name>
+    <description>薄调度中心微服务：mse-job 到期计算与派发（置 trigger_pending + 踢键，复用既有触发链路）</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>service-job</artifactId>
+        </dependency>
+        <!-- 微服务形态基线（micro-starter）：Nacos/Dubbo/actuator/三方言驱动/Seata 内置。
+             本服务自带基座实现（service-job），排除契约消费桥接 starter-bridge，避免 RPC 回退 Bean 介入 -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>micro-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>vip.mseapp</groupId>
+                    <artifactId>starter-bridge</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

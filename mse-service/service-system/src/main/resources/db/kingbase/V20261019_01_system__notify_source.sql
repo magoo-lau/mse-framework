@@ -1,0 +1,38 @@
+-- mse-target: master
+
+-- =====================================================================
+-- 框架通知中枢：业务来源登记目录表 + 渠道目录接收人语义列（人大金仓；登记源 tenant_id=0
+-- 行经 runIgnore 写入，master 与 base+platform 双通道覆盖落点——两份内容同构）
+-- 加列 IF NOT EXISTS 幂等写法（金仓 PG 内核原生支持）：列已存在时跳过——
+-- 结构先行/账本缺席/半途失败重放均自愈
+-- 幂等：建表 IF NOT EXISTS，可重复执行
+-- =====================================================================
+
+CREATE TABLE IF NOT EXISTS sys_notify_source
+(
+    id             BIGINT        NOT NULL,
+    tenant_id      BIGINT        NOT NULL DEFAULT 0,
+    biz_code       VARCHAR(32)   NOT NULL,
+    biz_name       VARCHAR(64)   NOT NULL,
+    types          VARCHAR(1000) NULL,
+    provider_group VARCHAR(64)   NOT NULL,
+    last_push_time TIMESTAMP     NULL,
+    create_by      BIGINT        NULL,
+    create_time    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_by      BIGINT        NULL,
+    update_time    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted        SMALLINT      NOT NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    CONSTRAINT ux_notify_source_biz UNIQUE (biz_code, deleted)
+);
+COMMENT ON TABLE sys_notify_source IS '通知业务来源登记目录（业务积木自注册全局目录）';
+COMMENT ON COLUMN sys_notify_source.biz_code IS '业务来源码（全局唯一，如 oa/monitor）';
+COMMENT ON COLUMN sys_notify_source.biz_name IS '展示名（如「协同办公」）';
+COMMENT ON COLUMN sys_notify_source.types IS '消息类型清单 JSON（[{code,name}]；空=未声明类型仅通配可用）';
+COMMENT ON COLUMN sys_notify_source.provider_group IS '提供方服务名（dubbo group；本地 Bean 为 local）';
+COMMENT ON COLUMN sys_notify_source.last_push_time IS '最近登记变更时间';
+COMMENT ON COLUMN sys_notify_source.tenant_id IS '租户编号（登记源恒 0）';
+COMMENT ON COLUMN sys_notify_source.deleted IS '逻辑删除（0 未删除 1 已删除）';
+
+ALTER TABLE sys_notify_channel ADD COLUMN IF NOT EXISTS receiver_required SMALLINT NULL;
+COMMENT ON COLUMN sys_notify_channel.receiver_required IS '是否需个人接收人（NULL/1=按 receiverIds 投递；0=群发渠道如 Webhook，无接收人也投递）';

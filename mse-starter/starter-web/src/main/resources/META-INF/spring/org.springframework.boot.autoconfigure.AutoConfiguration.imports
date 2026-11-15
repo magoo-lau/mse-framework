@@ -1,0 +1,3 @@
+vip.mseapp.web.config.MseWebAutoConfiguration
+vip.mseapp.core.schedule.MseSchedulingAutoConfiguration
+vip.mseapp.core.context.MseContextPropagationAutoConfiguration

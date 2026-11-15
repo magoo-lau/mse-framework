@@ -1,0 +1,180 @@
+name: ai-mse
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: mse-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: mse_platform
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      # 平台库结构+种子已版本化进 service-platform（db/<方言>/V*.sql，platform 通道启动自动应用）；
+      # 缺省共享租户库 mse_tenant 由 mse-system 的 SharedMainBootstrap 按 mse.tenant.shared-main.* 建库（MySQL；
+      # 各服务按同一坐标自 declare 注册内置池、不落登记表；Bootstrap eager 建 TENANT 身份表，MASTER 业务表
+      # 随各服务首路由懒直建，车队重放收敛 base 副本）；
+      # mysql/demo/ 仅保留可选示例租户两段脚本（手动执行）：02 控制面段→mse_platform、
+      # 03 租户身份段→mse_tenant（共享库模式无需绑库即可登录）
+      # 客户端默认字符集 utf8mb4（镜像客户端默认 latin1，裸 docker exec 导 UTF-8 SQL 会乱码）
+      - ./mysql/client-utf8mb4.cnf:/etc/mysql/conf.d/zz-client-utf8mb4.cnf:ro
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p123456" ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    container_name: mse-redis
+    restart: unless-stopped
+    ports:
+      # 宿主端口可经 MSE_REDIS_HOST_PORT 覆盖（Windows Hyper-V 常保留 6300-6399 段导致 6379 绑定失败）
+      - "${MSE_REDIS_HOST_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  nacos:
+    image: nacos/nacos-server:v3.0.0
+    container_name: mse-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLED: "false"
+      # v3 启动强校验要求提供（即便 auth 关闭）
+      NACOS_AUTH_TOKEN: "MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMw=="
+      NACOS_AUTH_IDENTITY_KEY: serverIdentity
+      NACOS_AUTH_IDENTITY_VALUE: security
+      JVM_XMS: 256m
+      JVM_XMX: 512m
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      # v3 控制台独立端口；宿主 8080 与单体示例 mse-monolith 冲突，改用 18080
+      # 访问 http://localhost:18080
+      - "18080:8080"
+    volumes:
+      # 配置中心数据持久化（embedded derby）：重建容器不丢配置
+      - nacos-data:/home/nacos/data
+    healthcheck:
+      test: [ "CMD", "curl", "-fs", "http://localhost:8848/nacos/v3/admin/core/state" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # 一次性任务：读取 docker/nacos/config/ 原始配置留档统一写入 Nacos（脚本默认幂等，已存在的
+  # Data ID 跳过不覆盖线上修改；宿主机可跑 sh docker/nacos/init-configs.sh --force 强制同步基线）。
+  # 微服务启动器经 application.yaml 的 spring.config.import 从 Nacos 拉取配置（本地仅留应用名与接入地址）。
+  nacos-config-init:
+    image: curlimages/curl:8.12.1
+    container_name: mse-nacos-config-init
+    restart: "no"
+    depends_on:
+      nacos:
+        condition: service_healthy
+    environment:
+      NACOS_ADDR: http://nacos:8848
+      NACOS_AUTH_IDENTITY_KEY: serverIdentity
+      NACOS_AUTH_IDENTITY_VALUE: security
+    volumes:
+      - ./nacos:/nacos:ro
+    entrypoint: [ "sh", "/nacos/init-configs.sh" ]
+
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.3.1
+    container_name: mse-rocketmq-namesrv
+    restart: unless-stopped
+    command: sh mqnamesrv
+    ports:
+      - "9876:9876"
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.3.1
+    container_name: mse-rocketmq-broker
+    restart: unless-stopped
+    command: sh mqbroker -n mse-rocketmq-namesrv:9876 -c /home/rocketmq/conf/broker.conf
+    ports:
+      - "10911:10911"
+      - "10909:10909"
+    volumes:
+      - ./rocketmq/broker.conf:/home/rocketmq/conf/broker.conf:ro
+    depends_on:
+      - rocketmq-namesrv
+
+  seata:
+    image: apache/seata-server:2.6.0.jdk21
+    container_name: mse-seata
+    restart: unless-stopped
+    environment:
+      SEATA_PORT: "8091"
+      STORE_MODE: file
+    ports:
+      - "8091:8091"
+
+  # 搜索引擎（mse-search）默认引擎：Elasticsearch 9.x 单节点 + smartcn 中文分析
+  # （镜像经 docker/elasticsearch/Dockerfile 预装 bundled 插件，离线可装）
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+      args:
+        ES_VERSION: "9.2.8"
+    image: mse/elasticsearch:9.2.8-smartcn
+    container_name: mse-elasticsearch
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      TZ: Asia/Shanghai
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  # 应用容器示例（不影响默认启动，需要时追加 profile）：
+  #   docker compose --profile apps up -d --build
+  # 微服务模式各启动器同理：改用各模块 Dockerfile（mse-framework/mse-boot/boot-*/Dockerfile）
+  # 并加 MSE_NACOS_ADDR=nacos:8848（运行期配置在 Nacos：nacos-config-init 已把
+  # docker/nacos/config/ 基线导入），或直接用 ./mse-framework/mse-boot/build-images.sh 构建镜像后 image 引用
+  mse-monolith:
+    build:
+      context: ../..
+      dockerfile: mse-sample/mse-monolith/Dockerfile
+    image: mse/mse-monolith:1.0.0
+    container_name: mse-monolith
+    restart: unless-stopped
+    profiles: [ "apps" ]
+    environment:
+      TZ: Asia/Shanghai
+      MSE_MYSQL_HOST: mysql
+      MSE_REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  mysql-data:
+  redis-data:
+  nacos-data:
+  es-data:

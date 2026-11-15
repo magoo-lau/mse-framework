@@ -1,0 +1,4 @@
+vip.mseapp.rpc.bridge.config.RpcBridgeAutoConfiguration
+vip.mseapp.rpc.bridge.config.BaseDataRegistryAutoConfiguration
+vip.mseapp.rpc.bridge.config.ScheduleStateBridgeAutoConfiguration
+vip.mseapp.rpc.bridge.config.TenantDataBridgeAutoConfiguration

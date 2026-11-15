@@ -1,0 +1,75 @@
+# ==================== 微服务配置·mse-system 服务专属（端口 + 数据源切位） ====================
+# Data ID: mse-system.yaml    Group: DEFAULT_GROUP
+# 生效优先级：boot-system 的 spring.config.import 中本 Data ID 声明在共享 mse-micro-db.yaml 之后，
+# 同名键以本文件为准（其余键继承共享文件）。
+#
+# 0.1.0 去默认租户库：primary=platform（平台库）；缺省共享租户库不再是静态数据源——
+#   每服务按自己的 mse.tenant.shared-main.* 自 declare 注册内置共享库池（键默认=本服务应用名=
+#   服务私有，显式 key:'*'=通用；不落 sys_tenant_datasource 登记表）；本服务 SharedMainBootstrap
+#   按该坐标建库（MySQL）+ eager 建 TENANT 身份表，其余租户库连接经登记表动态注册（lazy 池），
+#   启动零租户库连接；MASTER 业务表随各服务首路由懒直建。dm/kingbase 的共享库请在
+#   「租户数据源」界面登记（schema 形态 URL 不宜属性自 declare）。
+server:
+  port: 48081
+spring:
+  datasource:
+    dynamic:
+      # 每个底层真实数据源单独包 Seata 代理（配合 seata.enable-auto-data-source-proxy=false）
+      seata: true
+      primary: platform
+      strict: false
+      hikari:
+        maximum-pool-size: 5
+        minimum-idle: 1
+        idle-timeout: 300000
+        max-lifetime: 1800000
+        connection-timeout: 10000
+      datasource:
+        platform:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MSE_MYSQL_HOST:localhost}:${MSE_MYSQL_PORT:3306}/${MSE_MYSQL_DB:mse_platform}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useInformationSchema=true&nullCatalogMeansCurrent=true
+          username: ${MSE_MYSQL_USER:root}
+          password: ${MSE_MYSQL_PASSWORD:123456}
+
+mse:
+  tenant:
+    # 内置共享租户库坐标（每服务自 declare 注册内置池、不落登记表；本服务 Bootstrap 建库+eager 身份表；
+    # 不配=纯独立库部署，启动零租户库动作）
+    shared-main:
+      url: jdbc:mysql://${MSE_MYSQL_HOST:localhost}:${MSE_MYSQL_PORT:3306}/${MSE_TENANT_DB:mse_tenant}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: ${MSE_MYSQL_USER:root}
+      password: ${MSE_MYSQL_PASSWORD:123456}
+      db-type: mysql
+    schema:
+      # 缺省共享库 eager 建 TENANT 身份表（默认开：保证车队 BASE 重放不被 identityReady 跳过）
+      shared-main-eager-init: true
+
+---
+# ==================== 信创数据库切换（可选 profile；达梦单实例多 schema：master/platform 同 schema） ====================
+spring:
+  config:
+    activate:
+      on-profile: dm
+  datasource:
+    dynamic:
+      datasource:
+        platform:
+          driver-class-name: dm.jdbc.driver.DmDriver
+          url: jdbc:dm://${MSE_DM_HOST:localhost}:${MSE_DM_PORT:5236}?schema=MSE&characterEncoding=UTF-8
+          username: ${MSE_DM_USER:SYSDBA}
+          password: ${MSE_DM_PASSWORD:SYSDBA001}
+
+---
+# ==================== 金仓（库名 mse + schema mse：master/platform 同库） ====================
+spring:
+  config:
+    activate:
+      on-profile: kingbase
+  datasource:
+    dynamic:
+      datasource:
+        platform:
+          driver-class-name: com.kingbase8.Driver
+          url: jdbc:kingbase8://${MSE_KB_HOST:localhost}:${MSE_KB_PORT:54321}/${MSE_KB_DB:mse}?currentSchema=mse,public
+          username: ${MSE_KB_USER:system}
+          password: ${MSE_KB_PASSWORD:123456}

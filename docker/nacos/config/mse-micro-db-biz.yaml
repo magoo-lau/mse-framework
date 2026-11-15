@@ -1,0 +1,107 @@
+# ==================== 微服务共享配置·业务服务版（数据源 / MyBatis-Plus / Seata） ====================
+# Data ID: mse-micro-db-biz.yaml    Group: DEFAULT_GROUP
+# 消费方：业务微服务（mse-oa/mp/open/data/ai/fs/search/demo 等 xxx-boot）；
+# 基座服务（mse-system 用 mse-system.yaml、mse-platform / mse-monitor 用 mse-micro-db.yaml）。
+# 0.1.0 去默认租户库：本文件只静态声明 platform=平台库（primary）；租户库（缺省共享库 shared-main /
+# 其他共享库/独立库）全部经平台端「平台管理 → 租户数据源」登记、运行时动态注册（lazy 池 + 懒建结构），
+# 启动零租户库连接。缺省共享库由各服务按自己的 mse.tenant.shared-main.* 自 declare 注册内置池
+# （不落登记表；docker 部署各服务坐标同库，见 mse-system.yaml）；无上下文租户域语句落 primary
+# 缺表即快速失败（防错库）。
+# 控制面表（sys_tenant 系/目录）数据面仅经 starter-bridge RPC/快照消费，不直查平台表。
+spring:
+  datasource:
+    dynamic:
+      # 每个底层真实数据源单独包 Seata 代理（配合 seata.enable-auto-data-source-proxy=false）
+      seata: true
+      primary: platform
+      strict: false
+      # 动态注册的租户/共享库池继承全局上限（每库小池，防总连接数爆炸）
+      hikari:
+        maximum-pool-size: 5
+        minimum-idle: 1
+        idle-timeout: 300000
+        max-lifetime: 1800000
+        connection-timeout: 10000
+      datasource:
+        # 平台库（平台世界=租户 0 的专属库；primary——无租户上下文语句的缺省落点，缺表快速失败）
+        platform:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${MSE_MYSQL_HOST:localhost}:${MSE_MYSQL_PORT:3306}/${MSE_MYSQL_DB:mse_platform}?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useInformationSchema=true&nullCatalogMeansCurrent=true
+          username: ${MSE_MYSQL_USER:root}
+          password: ${MSE_MYSQL_PASSWORD:123456}
+
+mybatis-plus:
+  global-config:
+    banner: false
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+
+seata:
+  # 已知限制：Seata 2.6 客户端在 undo 生成阶段存在主键元数据缺陷（seata-all fat jar），
+  # 全局回滚正确但正常提交路径报错；生产升级 Seata 修复版后改为 true 启用。
+  # Seata 已随 micro-starter 内置（微服务基础能力）；置 MSE_SEATA_ENABLED=true 后可在全局事务内演示跨库回滚。
+  enabled: ${MSE_SEATA_ENABLED:false}
+  # 代理交给 dynamic-datasource 逐数据源处理，避免整体代理导致跨库 undo 错位
+  enable-auto-data-source-proxy: false
+  application-id: ${spring.application.name}
+  tx-service-group: mse-tx-group
+  service:
+    vgroup-mapping:
+      mse-tx-group: default
+    grouplist:
+      default: ${MSE_SEATA_ADDR:localhost:8091}
+  config:
+    type: file
+  registry:
+    type: file
+
+# ==================== 信创数据库切换（可选 profile，默认 MySQL 不受影响） ====================
+# 启动加 --spring.profiles.active=dm 或 kingbase 即切换；业务表结构已版本化进各 xxx-service jar
+#（db/<方言>/V*.sql，TENANT 通道身份表 + MASTER 通道业务表随启动自动直建）
+---
+spring:
+  config:
+    activate:
+      on-profile: dm
+  datasource:
+    dynamic:
+      datasource:
+        platform:
+          driver-class-name: dm.jdbc.driver.DmDriver
+          url: jdbc:dm://${MSE_DM_HOST:localhost}:${MSE_DM_PORT:5236}?schema=${MSE_PLATFORM_SCHEMA:MSE}&characterEncoding=UTF-8
+          username: ${MSE_DM_USER:SYSDBA}
+          password: ${MSE_DM_PASSWORD:SYSDBA001}
+mse:
+  tenant:
+    # 内置共享库坐标（OA 流程引擎引导池用；建库+eager 身份表仅基座 SharedMainBootstrap 执行，
+    # 业务服务按本坐标自 declare 注册内置池、只注册不种子；不用 OA 的服务可忽略。
+    # 微服务形态与 mse-system 的坐标保持同库）
+    shared-main:
+      url: jdbc:mysql://${MSE_MYSQL_HOST:localhost}:${MSE_MYSQL_PORT:3306}/${MSE_TENANT_DB:mse_tenant}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: ${MSE_MYSQL_USER:root}
+      password: ${MSE_MYSQL_PASSWORD:123456}
+      db-type: mysql
+  mybatis:
+    db-type: dm
+
+---
+spring:
+  config:
+    activate:
+      on-profile: kingbase
+  datasource:
+    dynamic:
+      datasource:
+        platform:
+          driver-class-name: com.kingbase8.Driver
+          url: jdbc:kingbase8://${MSE_KB_HOST:localhost}:${MSE_KB_PORT:54321}/${MSE_KB_DB:mse}?currentSchema=${MSE_PLATFORM_SCHEMA:mse},public
+          username: ${MSE_KB_USER:system}
+          password: ${MSE_KB_PASSWORD:123456}
+mse:
+  mybatis:
+    db-type: kingbase_es

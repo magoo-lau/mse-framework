@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>vip.mseapp</groupId>
+        <artifactId>mse-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>starter-web</artifactId>
+    <name>starter-web</name>
+    <description>Web 自动装配件：装配 common-web 的租户解析过滤器、traceId、全局异常、Jackson 定制与 TenantIgnore 切面；工具与能力本体在 common-web</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-web</artifactId>
+        </dependency>
+        <!-- 统一调度 SPI（@MseScheduled / MseTaskScheduler；装配件在 vip.mseapp.core.schedule，与工具同包名） -->
+        <dependency>
+            <groupId>vip.mseapp</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+        <!-- Reactor 自动上下文传播（仅 classpath 存在 reactor-core 的应用生效；optional 不传递，AI 类应用随 Spring AI 自带） -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
