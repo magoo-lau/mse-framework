@@ -148,30 +148,8 @@ services:
       timeout: 5s
       retries: 20
 
-  # 应用容器示例（不影响默认启动，需要时追加 profile）：
-  #   docker compose --profile apps up -d --build
-  # 微服务模式各启动器同理：改用各模块 Dockerfile（mse-framework/mse-boot/boot-*/Dockerfile）
-  # 并加 MSE_NACOS_ADDR=nacos:8848（运行期配置在 Nacos：nacos-config-init 已把
-  # docker/nacos/config/ 基线导入），或直接用 ./mse-framework/mse-boot/build-images.sh 构建镜像后 image 引用
-  mse-monolith:
-    build:
-      context: ../..
-      dockerfile: mse-sample/mse-monolith/Dockerfile
-    image: mse/mse-monolith:1.0.0
-    container_name: mse-monolith
-    restart: unless-stopped
-    profiles: [ "apps" ]
-    environment:
-      TZ: Asia/Shanghai
-      MSE_MYSQL_HOST: mysql
-      MSE_REDIS_HOST: redis
-    ports:
-      - "8080:8080"
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+  # 应用镜像不在本 compose：微服务启动器镜像用 ./mse-boot/build-images.sh 构建；
+  # 业务工程与示例（mse-monolith 等）已拆分至各自仓库，应用容器编排见对应仓库 docker/。
 
 volumes:
   mysql-data:

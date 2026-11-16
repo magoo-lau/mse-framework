@@ -1,0 +1,26 @@
+# 构建上下文瘦身 + 避免宿主机产物/密钥进入镜像
+# （mse-boot 各启动器 Dockerfile 以本仓根为 context，COPY . . 前先排除无关内容）
+.git
+.idea
+.vscode
+*.iml
+
+# 构建产物（镜像内由 Maven 重新构建）
+**/target/
+
+# 前端工程（后端镜像不需要）
+mse-ui
+mse-ui-mobile
+mse-ui-shared
+**/node_modules
+**/dist
+
+# 本地环境与部署编排
+**/docker
+**/k8s/
+**/Dockerfile*
+**/build-images.sh
+
+# 系统文件
+.DS_Store
+Thumbs.db
