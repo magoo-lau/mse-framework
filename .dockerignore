@@ -9,9 +9,6 @@
 **/target/
 
 # 前端工程（后端镜像不需要）
-mse-ui
-mse-ui-mobile
-mse-ui-shared
 **/node_modules
 **/dist
 

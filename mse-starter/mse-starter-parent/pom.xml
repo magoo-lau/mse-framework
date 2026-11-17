@@ -7,7 +7,7 @@
     <!-- 业务工程统一父 pom（独立 pom，不挂 mse-framework parent 链，先例：spring-boot-starter-parent）：
          收编 JDK21 编译、spring-boot 插件、基座 BOM 导入与仓库配置，
          业务工程 parent 指向本 pom 后只需声明自身坐标/模块/自有依赖版本管理 -->
-    <groupId>vip.mseapp</groupId>
+    <groupId>com.github.magoo-lau.mse-framework</groupId>
     <artifactId>mse-starter-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -29,7 +29,7 @@
         <dependencies>
             <!-- 基座 BOM：仲裁全部第三方 + 基座模块（common-* / starter-* / service-* / api-*）版本 -->
             <dependency>
-                <groupId>vip.mseapp</groupId>
+                <groupId>com.github.magoo-lau.mse-framework</groupId>
                 <artifactId>mse-dependencies</artifactId>
                 <version>${mse.version}</version>
                 <type>pom</type>

@@ -13,15 +13,15 @@ mse-framework/
 ├── mse-api/                # 契约积木：api-system/api-tenant/api-fs/api-notify（跨服务 RPC 唯一合法依赖）
 ├── mse-service/            # 基座业务积木：service-system/platform/auth/job（RBAC、多租户控制面、认证、系统管理、薄调度中心）
 ├── mse-boot/               # 微服务启动器：boot-gateway/system/platform/auth/job + build-images.sh + k8s/configmap
-├── mse-ui/                 # 前端基座（Vue3 + wujie 微前端主应用，租户端 dist/tenant + 平台端 dist/platform 双模式）
-├── mse-ui-mobile/          # 移动基站（Vue3 + Vant 4，base=/m/）
-├── mse-ui-shared/          # 子应用公共运行时源码包（file: 源码直出：请求工厂/auth store/权限指令/主题桥接/Pagination/CronInput）
+├──（前端基座三工程已全部独立成仓：mse-ui（wujie 主应用双模式）/ mse-ui-mobile（移动基站）/ mse-ui-shared（公共运行时源码包，
+│    各自 github.com/magoo-lau/<名>；mse-ui-shared 作为 npm git 依赖被全部前端消费——请求工厂/auth store/权限指令/主题桥接/
+│    Pagination/CronInput，约定见 docs/frontend.md）
 └── docker/                 # 部署脚本：docker-compose、Nacos 基线配置 + init-configs.sh、信创方言、ES 镜像构建
 ```
 
 ## 二、积木原则（红线）
 
-1. **只沉淀与具体业务无关的基础能力**：RBAC、多租户、认证、系统管理（mse-service）、技术组件工具与自动装配（mse-common + mse-starter）、契约（mse-api）、微服务启动器（mse-boot）、前端基座。业务功能、示例/演示功能一律不进本仓（示例在 mse-sample 仓，业务在 mse-modules / mse-mes / mse-oa / mse-mp 各仓）。
+1. **只沉淀与具体业务无关的基础能力**：RBAC、多租户、认证、系统管理（mse-service）、技术组件工具与自动装配（mse-common + mse-starter）、契约（mse-api）、微服务启动器（mse-boot）。前端基座在独立仓（mse-ui / mse-ui-mobile / mse-ui-shared）。业务功能、示例/演示功能一律不进本仓（示例在 mse-sample 仓，业务在 mse-modules / mse-mes / mse-oa / mse-mp 各仓）。
 2. **用不到的能力不裁剪**：禁止为"去掉不需要的功能"修改或删除本仓内容——用不到就不引入（后端不依赖 jar、前端不登记子应用）。
 3. **工具与装配严格分离**：`common-*` 只放工具/通用能力（无 `AutoConfiguration`、无 imports 文件）；自动装配一律放 `starter-*`（装配类 FQCN 与工具同包名，业务工程零感知）。`mse.rpc.mode` 由形态启动器决定：micro-starter 默认 dubbo、mono-starter 保持 local，显式配置可覆盖。
 4. **默认实现全部可替换**：service 模块各默认实现带 `@ConditionalOnMissingBean(契约类型)`；控制器开关 `mse.service.<system|platform|auth|job>.controller.enabled`（业务积木同款 `mse.service.<biz>.controller.enabled`）。
@@ -50,7 +50,7 @@ mse-framework/
 
 - `sh build.sh`（缺省 skipTests，`MSE_RUN_ALL_TESTS=1` 放开）；`sh build-ui.sh`（ui-shared → ui → mobile）。
 - 镜像：`sh mse-boot/build-images.sh`（boot-gateway/system/platform/auth/job 五启动器，各模块目录自带 Dockerfile，context=本仓根；Dockerfile.prebuilt 供本机已 package 快速出镜像）。业务工程镜像在各业务仓构建，基础设施（MySQL/Redis/Nacos/RocketMQ/Seata/ES）compose 真源在本仓 `docker/`。
-- 验证底线：`mvn install` 通过（建议含测试）；mse-ui / mse-ui-mobile `npm run type-check` 零错误；涉租户/权限行为按 docs/verification.md 人工回归。
+- 验证底线：`mvn install` 通过（建议含测试）；前端仓（mse-ui / mse-ui-mobile）改动时 `npm run type-check` 零错误；涉租户/权限行为按 docs/verification.md 人工回归。
 
 ## 七、文档与提交纪律
 

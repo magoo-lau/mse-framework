@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>vip.mseapp</groupId>
+        <groupId>com.github.magoo-lau.mse-framework</groupId>
         <artifactId>mse-starter</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -20,18 +20,18 @@
     <dependencies>
         <!-- RPC 装配与模式引擎：本模块的 EnvironmentPostProcessor 提供 dubbo 默认值 -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>starter-rpc</artifactId>
         </dependency>
         <!-- 基座契约消费端桥接：鉴权数据源（@SaCheckPermission）/独立库租户路由/操作日志的 RPC 回退实现，
              经契约消费 mse-system / mse-tenant——业务服务不打包基座 HTTP 接口 -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>starter-bridge</artifactId>
         </dependency>
         <!-- Seata AT 分布式事务：微服务形态基础能力，默认经共享配置 seata.enabled=false 关停、按需开启 -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>starter-seata</artifactId>
         </dependency>
         <!-- 微服务基线：Nacos 配置中心（spring.config.import 拉取共享/专属配置）+ 服务注册 + 负载均衡 -->

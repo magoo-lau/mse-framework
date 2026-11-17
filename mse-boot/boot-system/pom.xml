@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>vip.mseapp</groupId>
+        <groupId>com.github.magoo-lau.mse-framework</groupId>
         <artifactId>mse-boot</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -16,17 +16,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>service-system</artifactId>
         </dependency>
         <!-- 微服务形态基线（micro-starter）：Nacos/Dubbo/actuator/三方言驱动/Seata 内置。
              本服务自带基座实现（service-system），排除契约消费桥接 starter-bridge，避免 RPC 回退 Bean 介入 -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>micro-starter</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>vip.mseapp</groupId>
+                    <groupId>com.github.magoo-lau.mse-framework</groupId>
                     <artifactId>starter-bridge</artifactId>
                 </exclusion>
             </exclusions>

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>vip.mseapp</groupId>
+        <groupId>com.github.magoo-lau.mse-framework</groupId>
         <artifactId>mse-service</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -17,7 +17,7 @@
     <dependencies>
         <!-- 触发踢键（StringRedisTemplate）：编译期可见，运行期由 mono/micro-starter 传递装配 -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>starter-redis</artifactId>
         </dependency>
         <!-- 单测（到期判定/表达式解析） -->

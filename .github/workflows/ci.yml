@@ -23,17 +23,3 @@ jobs:
           cache: maven
       - name: mvn install（reactor 全量；Testcontainers 用例无 Docker 自动跳过）
         run: mvn -B -ntp install
-
-  frontend:
-    name: 前端构建（ui-shared → ui → mobile）
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: '**/package-lock.json'
-      - name: build-ui.sh
-        run: sh build-ui.sh

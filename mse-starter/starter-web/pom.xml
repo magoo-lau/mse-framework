@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>vip.mseapp</groupId>
+        <groupId>com.github.magoo-lau.mse-framework</groupId>
         <artifactId>mse-starter</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -16,12 +16,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>common-web</artifactId>
         </dependency>
         <!-- 统一调度 SPI（@MseScheduled / MseTaskScheduler；装配件在 vip.mseapp.core.schedule，与工具同包名） -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>common-core</artifactId>
         </dependency>
         <!-- Reactor 自动上下文传播（仅 classpath 存在 reactor-core 的应用生效；optional 不传递，AI 类应用随 Spring AI 自带） -->

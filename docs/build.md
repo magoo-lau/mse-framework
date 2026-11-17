@@ -9,7 +9,6 @@ sh build-ui.sh                    # 前端三工程：mse-ui-shared → mse-ui �
 sh build-ui.sh mse-ui             # 子集构建
 ```
 
-- build-ui.sh 清单顺序有语义：mse-ui-shared 必须排在消费者之前（file: 源码直出）。
 - type-check 门禁试点：mse-ui / mse-ui-mobile / mse-ui-shared 三工程。
 - Windows 本地注意：dev server 运行中会锁 native 二进制，npm ci 前先停 dev server。
 
@@ -48,3 +47,11 @@ sh build-ui.sh mse-ui             # 子集构建
 - 后端改动：`mvn install` 通过（建议含测试）。
 - 前端改动：`npm run build` 通过；mse-ui / mse-ui-mobile 另须 `npm run type-check` 零错误。
 - 涉租户/权限行为：按 docs/tenancy.md 的口径人工回归。
+
+## 六、跨仓依赖 JitPack 解析（Maven）
+
+- 本仓产物对外坐标为 **`com.github.magoo-lau.mse-framework:<模块>:1.0.0-SNAPSHOT`**（JitPack 多模块规则：groupId=com.github.用户.仓库，artifactId 保留）。
+- 消费方（mse-modules / mse-mes / mse-oa / mse-mp / mse-sample 各仓）pom 声明 `<repository> https://jitpack.io`；本地 .m2 命中新坐标时优先本地，未命中自动从 JitPack 拉取（免上游 checkout 构建）。
+- **发版锚点**：本仓打 tag `1.0.0-SNAPSHOT`（version=tag 名），JitPack 按该 tag 在线构建（jitpack.yml 指定 openjdk21）；移动 tag 后需在 jitpack.io 网页清缓存才会重建。
+- 本地开发仍推荐顺序构建上游（`sh build.sh` 直接 install 新坐标入 .m2，比 JitPack 首次在线构建快且稳）。
+- Java 包名 `vip.mseapp.*` 与 Maven 坐标无关，保持不变。

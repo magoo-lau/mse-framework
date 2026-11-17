@@ -27,7 +27,7 @@
 | [modules.md](modules.md) | common-*（9 件工具积木）与 starter-*（装配件与形态启动器）清单与要点 |
 | [api.md](api.md) | 契约积木 api-system / api-tenant / api-fs / api-notify 与 RPC 规范 |
 | [services.md](services.md) | 基座 service-system / platform / auth / job 与六启动器、消息通知 |
-| [frontend.md](frontend.md) | 前端基座 mse-ui / mse-ui-mobile / mse-ui-shared 与子应用拼法、微前端约定 |
+| [frontend.md](frontend.md) | 前端体系（三独立仓 mse-ui / mse-ui-mobile / mse-ui-shared）与子应用拼法、微前端约定 |
 
 ## 跨仓约定（重要）
 

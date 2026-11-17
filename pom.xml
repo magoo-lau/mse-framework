@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>vip.mseapp</groupId>
+    <groupId>com.github.magoo-lau.mse-framework</groupId>
     <artifactId>mse-framework</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -36,7 +36,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>vip.mseapp</groupId>
+                <groupId>com.github.magoo-lau.mse-framework</groupId>
                 <artifactId>mse-dependencies</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>

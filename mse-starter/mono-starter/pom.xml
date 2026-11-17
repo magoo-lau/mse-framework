@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>vip.mseapp</groupId>
+        <groupId>com.github.magoo-lau.mse-framework</groupId>
         <artifactId>mse-starter</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -21,20 +21,20 @@
     <dependencies>
         <!-- 基座三积木：starter-web/mybatis/redis/security/rpc 由其父 pom 统一依赖、传递带入 -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>service-system</artifactId>
         </dependency>
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>service-platform</artifactId>
         </dependency>
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>service-auth</artifactId>
         </dependency>
         <!-- 基座契约桥接（单体下各 RPC 回退 Bean 让位基座本地实现）+ db/base 基座库脚本推送 -->
         <dependency>
-            <groupId>vip.mseapp</groupId>
+            <groupId>com.github.magoo-lau.mse-framework</groupId>
             <artifactId>starter-bridge</artifactId>
         </dependency>
         <dependency>
